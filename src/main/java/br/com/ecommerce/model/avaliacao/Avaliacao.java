@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Avaliacao {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Double nota;
 

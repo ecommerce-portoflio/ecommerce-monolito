@@ -23,7 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NoArgsConstructor
 public class Usuario implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
     @Column(unique = true)
@@ -36,6 +36,24 @@ public class Usuario implements UserDetails {
     private String cpf;
     private String cnpj;
     private boolean ativo;
+
+    public Usuario(DadosCadastro dadosCadastro, String senhaCriptografada) {
+        nome = dadosCadastro.nome();
+        email = dadosCadastro.email();
+        this.senha = senhaCriptografada;
+        telefone = dadosCadastro.telefone();
+        role = "ROLE_CLIENTE";
+
+        if (dadosCadastro.cnpj() != null)
+            this.cnpj = dadosCadastro.cnpj();
+        else if (dadosCadastro.cpf() != null)
+            this.cpf = dadosCadastro.cpf();
+        else
+//            TODO: Melhorar a validação de documento
+            throw new RuntimeException("Informe um documento!");
+
+        ativo = true;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
