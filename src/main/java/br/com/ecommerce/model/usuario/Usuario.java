@@ -74,4 +74,15 @@ public class Usuario implements UserDetails {
     public boolean isEnabled() {
         return ativo;
     }
+
+    public void atualizar(DadosAtualizarUsuario dto, String novaSenha) {
+        if (novaSenha != null && !novaSenha.isBlank())
+            this.senha = novaSenha;
+        if (dto.nome() != null && !dto.nome().isBlank())
+            this.nome = dto.nome();
+        if (dto.email() != null && !dto.email().isBlank())
+            this.email = dto.email();
+        if (dto.telefone() != null && !dto.telefone().isBlank())
+            this.telefone = dto.telefone();
+    }
 }
