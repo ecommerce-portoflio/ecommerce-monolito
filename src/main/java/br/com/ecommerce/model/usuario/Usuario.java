@@ -33,7 +33,7 @@ public class Usuario implements UserDetails {
     private String documento;
     private boolean ativo;
 
-    public Usuario(DadosCadastro dadosCadastro, String senhaCriptografada) {
+    public Usuario(DadosCadastroUsuario dadosCadastro, String senhaCriptografada) {
         nome = dadosCadastro.nome();
         email = dadosCadastro.email();
         senha = senhaCriptografada;

@@ -1,7 +1,7 @@
 package br.com.ecommerce.controller;
 
 import br.com.ecommerce.model.usuario.DadosAtualizarUsuario;
-import br.com.ecommerce.model.usuario.DadosCadastro;
+import br.com.ecommerce.model.usuario.DadosCadastroUsuario;
 import br.com.ecommerce.model.usuario.Usuario;
 import br.com.ecommerce.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -24,7 +23,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody @Valid DadosCadastro dadosCadastro, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<?> cadastrar(@RequestBody @Valid DadosCadastroUsuario dadosCadastro, UriComponentsBuilder uriBuilder) {
         var usuario = usuarioService.cadastrar(dadosCadastro);
         URI uri = uriBuilder
                 .path("/usuario/{id}")
