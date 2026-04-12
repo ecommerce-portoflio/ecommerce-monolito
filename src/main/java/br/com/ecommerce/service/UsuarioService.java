@@ -1,10 +1,8 @@
 package br.com.ecommerce.service;
 
+import br.com.ecommerce.infra.exception.RegraDeNegocioException;
 import br.com.ecommerce.model.auth.DadosLogin;
-import br.com.ecommerce.model.usuario.DadosAtualizarUsuario;
-import br.com.ecommerce.model.usuario.DadosCadastro;
-import br.com.ecommerce.model.usuario.DadosUsuario;
-import br.com.ecommerce.model.usuario.Usuario;
+import br.com.ecommerce.model.usuario.*;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,11 +30,14 @@ public class UsuarioService implements UserDetailsService {
     }
 
     public DadosUsuario cadastrar(DadosCadastro dadosCadastro) {
-//        TODO: Aumentar validação para: telefone e CPF ou CNPJ
-        if (usuarioRepository.existsByEmailIgnoreCase(dadosCadastro.email())) {
-//            TODO: Classe personalizada e tratador de erros
-            throw new RuntimeException("Usuário já cadastrado com esse email!");
+        if (!validaDocumento(dadosCadastro))
+            throw new RegraDeNegocioException("Documento em formato inválido!");
+
+        if (usuarioRepository.existePorDadosUnicos(dadosCadastro.email(),
+                dadosCadastro.documento(), dadosCadastro.telefone())) {
+            throw new RegraDeNegocioException("Um ou mais dados já foram cadastrados para outro usuário!");
         }
+
         Usuario usuario = new Usuario(dadosCadastro, passwordEncoder.encode(dadosCadastro.senha()));
         usuarioRepository.save(usuario);
         return new DadosUsuario(usuario);
@@ -59,6 +60,17 @@ public class UsuarioService implements UserDetailsService {
     public void deletar(Long id) {
         var usuario = usuarioRepository.findById(id).orElseThrow();
         usuario.setAtivo(false);
+    }
+
+    private boolean validaDocumento(DadosCadastro dadosCadastro) {
+        String regex;
+        if (dadosCadastro.tipoPessoa() == TipoPessoa.PESSOA_FISICA)
+            regex = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$";
+        else
+//            A regex de CNPJ já está no novo formato aceitando alfanuméricos
+            regex = "^[A-Za-z0-9]{2}\\.[A-Za-z0-9]{3}\\.[A-Za-z0-9]{3}/[A-Za-z0-9]{4}-\\d{2}$";
+
+        return dadosCadastro.documento().matches(regex);
     }
 }
 

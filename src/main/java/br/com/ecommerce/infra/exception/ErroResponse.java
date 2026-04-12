@@ -1,7 +1,10 @@
 package br.com.ecommerce.infra.exception;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
+@Getter
 public class ErroResponse {
 
     private LocalDateTime timestamp;
@@ -17,6 +20,4 @@ public class ErroResponse {
         this.message = message;
         this.path = path;
     }
-
-    // getters
 }
