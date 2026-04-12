@@ -2,13 +2,13 @@
 
 create table if not exists usuarios (
     id bigserial primary key,
-    nome varchar(255),
-    email varchar(255) unique,
-    senha varchar(255),
-    telefone varchar(50),
+    nome varchar(255) not null,
+    email varchar(255) not null unique,
+    senha varchar(255) not null,
+    telefone varchar(50) not null unique,
     role varchar(50) not null,
-    cpf varchar(20),
-    cnpj varchar(20),
+    tipo_pessoa varchar(15) not null,
+    documento varchar(30) not null unique,
     ativo boolean not null default true
 );
 

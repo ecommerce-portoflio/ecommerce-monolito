@@ -3,12 +3,7 @@ package br.com.ecommerce.model.usuario;
 import java.util.Collection;
 import java.util.Collections;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,26 +27,20 @@ public class Usuario implements UserDetails {
     private String telefone;
     @Column(nullable = false)
     private String role;
-    // PF ou PJ: um dos dois documentos devem estar preenchidos
-    private String cpf;
-    private String cnpj;
+
+    @Enumerated(EnumType.STRING)
+    private TipoPessoa tipoPessoa;
+    private String documento;
     private boolean ativo;
 
     public Usuario(DadosCadastro dadosCadastro, String senhaCriptografada) {
         nome = dadosCadastro.nome();
         email = dadosCadastro.email();
-        this.senha = senhaCriptografada;
+        senha = senhaCriptografada;
         telefone = dadosCadastro.telefone();
         role = "ROLE_CLIENTE";
-
-        if (dadosCadastro.cnpj() != null)
-            this.cnpj = dadosCadastro.cnpj();
-        else if (dadosCadastro.cpf() != null)
-            this.cpf = dadosCadastro.cpf();
-        else
-//            TODO: Melhorar a validação de documento
-            throw new RuntimeException("Informe um documento!");
-
+        documento = dadosCadastro.documento();
+        tipoPessoa = dadosCadastro.tipoPessoa();
         ativo = true;
     }
 
