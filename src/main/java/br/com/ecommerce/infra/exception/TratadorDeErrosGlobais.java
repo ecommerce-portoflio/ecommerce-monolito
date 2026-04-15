@@ -3,6 +3,7 @@ package br.com.ecommerce.infra.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -91,6 +92,24 @@ public class TratadorDeErrosGlobais {
         );
 
         return ResponseEntity.badRequest().body(erro);
+    }
+
+    // =========================
+    // ACESSO NEGADO (403)
+    // =========================
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErroResponse> handleAcessoNegado(
+            AccessDeniedException ex,
+            HttpServletRequest request) {
+
+        ErroResponse erro = new ErroResponse(
+                HttpStatus.FORBIDDEN.value(),
+                "Acesso negado",
+                "Você não tem acesso a este recurso",
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(erro);
     }
 
     // =========================

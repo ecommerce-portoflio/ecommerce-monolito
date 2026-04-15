@@ -30,9 +30,10 @@ public class Produto {
     private Long id;
     private String nome;
     private String descricao;
-    private int quantidadeEstoque;
+    private Integer quantidadeEstoque;
     private BigDecimal valor;
     private Double mediaAvaliacoes;
+    private boolean ativo;
     
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "produto")
     private List<Avaliacao> avaliacoes;
@@ -40,4 +41,24 @@ public class Produto {
     @ManyToOne
     @JoinColumn(name = "vendedor_id", nullable = false)
     private Usuario vendedor;
+
+    public Produto(DadosCadastroProduto dto, Usuario logado) {
+        nome = dto.nome();
+        descricao = dto.descricao();
+        quantidadeEstoque = dto.quantidadeEstoque();
+        valor = dto.valor();
+        vendedor = logado;
+        ativo = true;
+    }
+
+    public void atualizar(DadosAtualizarProduto dto) {
+        if (dto.nome() != null && !dto.nome().isBlank())
+            this.nome = dto.nome();
+        if (dto.descricao() != null && !dto.descricao().isBlank())
+            this.descricao = dto.descricao();
+        if (dto.quantidadeEstoque() != null)
+            this.quantidadeEstoque = dto.quantidadeEstoque();
+        if (dto.valor() != null)
+            this.valor = dto.valor();
+    }
 }
