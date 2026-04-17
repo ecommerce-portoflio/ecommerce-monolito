@@ -2,8 +2,10 @@ package br.com.ecommerce.model.pedido;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import br.com.ecommerce.model.produto.Produto;
 import br.com.ecommerce.model.usuario.Usuario;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -44,5 +46,15 @@ public class Pedido {
     private Usuario vendedor;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProdutoPedido> produtos;
+    private List<ProdutoPedido> produtos = new ArrayList<>();
+
+    // Pedido de um produto só
+    public Pedido(Produto produto, Usuario comprador, Integer quantidade) {
+        this.comprador = comprador;
+        this.vendedor = produto.getVendedor();
+        this.statusPedido = StatusPedido.AGUARDANDO_PAGAMENTO;
+        this.valorTotal = produto.getValor().multiply(BigDecimal.valueOf(quantidade));
+        this.produtos.add(new ProdutoPedido(produto, this, quantidade));
+        // Data da compra só é preenchida após pagamento
+    }
 }

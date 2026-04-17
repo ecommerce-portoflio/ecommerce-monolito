@@ -30,4 +30,10 @@ public class ProdutoPedido {
     @ManyToOne
     @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
+
+    public ProdutoPedido(Produto produto, Pedido pedido, Integer quantidade) {
+        this.pedido = pedido;
+        this.produto = produto;
+        this.quantidade = quantidade;
+    }
 }

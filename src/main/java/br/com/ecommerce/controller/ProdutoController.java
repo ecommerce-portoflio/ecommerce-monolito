@@ -46,7 +46,7 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public Page<DadosProduto> buscarTodos(@PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+    public Page<DadosProduto> buscarTodos(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return produtoService.buscarTodos(pageable);
     }
 
@@ -56,7 +56,7 @@ public class ProdutoController {
     }
 
     @GetMapping("/vendedor/{id}")
-    public Page<DadosProduto> buscarPorVendedor(@PathVariable Long id, @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+    public Page<DadosProduto> buscarPorVendedor(@PathVariable Long id, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return produtoService.buscarPorVendedor(id, pageable);
     }
 
