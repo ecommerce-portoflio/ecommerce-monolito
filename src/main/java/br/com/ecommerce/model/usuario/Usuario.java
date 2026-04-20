@@ -11,6 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import br.com.ecommerce.model.carrinho.Carrinho;
+
 @Entity
 @Table(name = "usuarios")
 @Getter
@@ -33,6 +35,9 @@ public class Usuario implements UserDetails {
     private String documento;
     private boolean ativo;
 
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private Carrinho carrinho;
+
     public Usuario(DadosCadastroUsuario dadosCadastro, String senhaCriptografada) {
         nome = dadosCadastro.nome();
         email = dadosCadastro.email();
@@ -42,6 +47,7 @@ public class Usuario implements UserDetails {
         documento = dadosCadastro.documento();
         tipoPessoa = dadosCadastro.tipoPessoa();
         ativo = true;
+        carrinho = new Carrinho(this);
     }
 
     @Override

@@ -1,8 +1,10 @@
 package br.com.ecommerce.model.carrinho;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
+import br.com.ecommerce.model.produto.Produto;
 import br.com.ecommerce.model.usuario.Usuario;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -33,6 +35,21 @@ public class Carrinho {
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
     private Usuario usuario;
     
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "carrinho", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProdutoCarrinho> produtos;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "carrinho", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProdutoCarrinho> produtos = new ArrayList<>();
+
+    public Carrinho(Usuario usuario) {
+        this.usuario = usuario;
+        total = new BigDecimal(0);
+    }
+
+    public void adicionarProduto(Produto produto, Integer quantidade) {
+        produtos.add(new ProdutoCarrinho(produto, quantidade, this));
+        total = produto.getValor().multiply(BigDecimal.valueOf(quantidade)).add(total);
+    }
+
+    public void removerProduto(ProdutoCarrinho produtoCarrinho) {
+        produtos.remove(produtoCarrinho);
+        total = total.subtract(produtoCarrinho.getValorUnitario().multiply(BigDecimal.valueOf(produtoCarrinho.getQuantidade())));
+    }
 }

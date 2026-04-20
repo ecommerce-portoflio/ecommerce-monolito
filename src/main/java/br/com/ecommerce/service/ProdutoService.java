@@ -9,7 +9,6 @@ import br.com.ecommerce.model.usuario.Usuario;
 import br.com.ecommerce.repository.ProdutoRepository;
 import br.com.ecommerce.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;

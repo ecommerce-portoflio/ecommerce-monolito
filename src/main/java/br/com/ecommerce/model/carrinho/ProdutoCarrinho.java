@@ -3,13 +3,7 @@ package br.com.ecommerce.model.carrinho;
 import java.math.BigDecimal;
 
 import br.com.ecommerce.model.produto.Produto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,11 +20,18 @@ public class ProdutoCarrinho {
     private Integer quantidade;
     private BigDecimal valorUnitario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carrinho_id", nullable = false)
     private Carrinho carrinho;
+
+    public ProdutoCarrinho(Produto produto, Integer quantidade, Carrinho carrinho) {
+        this.quantidade = quantidade;
+        this.valorUnitario = produto.getValor();
+        this.produto = produto;
+        this.carrinho = carrinho;
+    }
 }
