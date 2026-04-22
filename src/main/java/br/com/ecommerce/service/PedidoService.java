@@ -1,30 +1,38 @@
 package br.com.ecommerce.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
+import br.com.ecommerce.model.carrinho.Carrinho;
+import br.com.ecommerce.model.carrinho.ProdutoCarrinho;
+import br.com.ecommerce.model.pedido.*;
+import br.com.ecommerce.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.ecommerce.infra.exception.RegraDeNegocioException;
-import br.com.ecommerce.model.pedido.DadosCadastroPedido;
-import br.com.ecommerce.model.pedido.DadosPedido;
-import br.com.ecommerce.model.pedido.Pedido;
-import br.com.ecommerce.model.pedido.StatusPedido;
 import br.com.ecommerce.model.produto.Produto;
 import br.com.ecommerce.model.usuario.Usuario;
-import br.com.ecommerce.repository.PedidoRepository;
-import br.com.ecommerce.repository.ProdutoRepository;
 import jakarta.transaction.Transactional;
 
 @Service
 public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final ProdutoRepository produtoRepository;
+    private final CarrinhoRepository carrinhoRepository;
+    private final ProdutoPedidoRepository produtoPedidoRepository;
+    private final ProdutoCarrinhoRepository produtoCarrinhoRepository;
 
-    public PedidoService(PedidoRepository pedidoRepository, ProdutoRepository prdoutoRepository) {
+    public PedidoService(PedidoRepository pedidoRepository, ProdutoRepository prdoutoRepository, CarrinhoRepository carrinhoRepository, ProdutoPedidoRepository produtoPedidoRepository, ProdutoCarrinhoRepository produtoCarrinhoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.produtoRepository = prdoutoRepository;
+        this.carrinhoRepository = carrinhoRepository;
+        this.produtoPedidoRepository = produtoPedidoRepository;
+        this.produtoCarrinhoRepository = produtoCarrinhoRepository;
     }
 
     @Transactional
@@ -40,10 +48,57 @@ public class PedidoService {
         return new DadosPedido(pedido);
     }
 
+    @Transactional
+    public DadosPedido fazerPedidoCarrinho(Usuario usuario) {
+        Carrinho carrinho = carrinhoRepository.findByUsuario(usuario);
+
+        validacoesPedidoCarrinho(carrinho);
+
+        Pedido pedido = pedidoRepository.save(new Pedido(carrinho));
+        carrinho.getProdutos().forEach(produtoCarrinho -> {
+            Produto produto = produtoCarrinho.getProduto();
+            produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - produtoCarrinho.getQuantidade());
+        });
+
+        carrinho.getProdutos().clear();
+        carrinho.setTotal(BigDecimal.ZERO);
+
+        return new DadosPedido(pedido);
+    }
+
+    @Transactional
+    public DadosPedido fazerPedidoVarios(Usuario usuario, List<DadosCadastroPedido> dto) {
+        Pedido pedido = new Pedido(usuario);
+        Carrinho carrinho = carrinhoRepository.findByUsuario(usuario);
+        List<Produto> listaProdutos = new ArrayList<>();
+
+        dto.forEach(dadosCadastroPedido -> {
+            Produto produto = produtoRepository.findByIdAndAtivo(dadosCadastroPedido.produtoId(), true)
+                    .orElseThrow(() -> new RegraDeNegocioException("Produto de ID " + dadosCadastroPedido.produtoId() + " não encontrado!"));
+
+            validacoesPedido(dadosCadastroPedido, produto, usuario);
+
+            pedido.acrescentarProduto(produto, dadosCadastroPedido.quantidade());
+            produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - dadosCadastroPedido.quantidade());
+            listaProdutos.add(produto);
+        });
+
+        List<ProdutoCarrinho> produtos = produtoCarrinhoRepository
+                .findByCarrinhoAndProdutoIn(carrinho, listaProdutos);
+        produtos.forEach(produtoCarrinho -> {
+            carrinho.setTotal(carrinho.getTotal()
+                            .subtract(produtoCarrinho.getValorUnitario()
+                                    .multiply(BigDecimal.valueOf(produtoCarrinho.getQuantidade()))));
+            carrinho.getProdutos().remove(produtoCarrinho);
+        });
+
+        return new DadosPedido(pedidoRepository.save(pedido));
+    }
+
     public DadosPedido buscarPedido(Long idPedido, Usuario logado) {
         var pedido = buscaPedido(idPedido);
 
-        if (pedido.getComprador().getId() != logado.getId() && pedido.getVendedor().getId() != logado.getId())
+        if (pedido.getComprador().getId() != logado.getId())
             throw new RegraDeNegocioException("Você não tem acesso a esse pedido!");
 
         return new DadosPedido(pedido);
@@ -70,12 +125,12 @@ public class PedidoService {
 
     public Page<DadosPedido> buscarMeusPedidos(Usuario usuario, Pageable pageable) {
         var pedidos = pedidoRepository.findByComprador(usuario, pageable);
-        return pedidos.map(pedido -> new DadosPedido(pedido));
+        return pedidos.map(DadosPedido::new);
     }
 
-    public Page<DadosPedido> buscarMeusPedidosVendidos(Usuario usuario, Pageable pageable) {
-        var pedidos = pedidoRepository.findByVendedor(usuario, pageable);
-        return pedidos.map(pedido -> new DadosPedido(pedido));
+    public Page<DadosProdutoPedido> buscarMeusPedidosVendidos(Usuario usuario, Pageable pageable) {
+        var pedidos = produtoPedidoRepository.buscarProdutosVendidos(usuario, pageable);
+        return pedidos.map(DadosProdutoPedido::new);
     }
 
     @Transactional
@@ -96,8 +151,8 @@ public class PedidoService {
     private void validacoesCancelamentoPedido(Pedido pedido, Usuario comprador) {
         if (pedido.getComprador().getId() != comprador.getId())
             throw new RegraDeNegocioException("Você não tem acesso a esse produto!");
-        
-        if (pedido.getStatusPedido() == StatusPedido.ENTREGUE || pedido.getStatusPedido() == StatusPedido.PAGO )
+
+        if (pedido.getStatusPedido() == StatusPedido.ENTREGUE || pedido.getStatusPedido() == StatusPedido.PAGO)
             throw new RegraDeNegocioException("O pedido já foi pago, não é possível cancelar!");
     }
 
@@ -129,8 +184,23 @@ public class PedidoService {
     private void validacoesPedido(DadosCadastroPedido dto, Produto produto, Usuario comprador) {
         if (dto.quantidade() > produto.getQuantidadeEstoque())
             throw new RegraDeNegocioException("Não há estoque disponível desse produto para essa quantidade!");
-        if (produto.getVendedor().getId() == comprador.getId())
+        if (Objects.equals(produto.getVendedor().getId(), comprador.getId()))
             throw new RegraDeNegocioException("Você não pode comprar seu próprio produto!");
+    }
+
+    private void validacoesPedidoCarrinho(Carrinho carrinho) {
+        if (carrinho.getProdutos().size() == 0)
+            throw new RegraDeNegocioException("Você não tem produtos no carrinho!");
+
+//        A validação de estoque do produto é feita
+//        novamente pois a quantidade em estoque do produto pode ter mudado desde
+//        sua adição ao carrinho do usuário. Uma possibilidade futura é adicionar
+//        um status ao produto de que seu estoque está abaixo e invalidar sua compra
+        for (var produtoCarrinho : carrinho.getProdutos()) {
+            Produto produto = produtoCarrinho.getProduto();
+            if (produto.getQuantidadeEstoque() < produtoCarrinho.getQuantidade())
+                throw new RegraDeNegocioException("A quantidade desejada não está disponível para o atual estoque do produto!");
+        }
     }
 
     private Pedido buscaPedido(Long idPedido) {

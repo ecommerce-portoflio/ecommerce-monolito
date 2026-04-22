@@ -10,15 +10,14 @@ public record DadosPedido(
     LocalDateTime dataCompra,
     StatusPedido statusPedido,
     Long compradorId,
-    Long vendedorId,
     List<DadosProdutoPedido> produtos
 ) {
     public DadosPedido(Pedido pedido) {
         this(pedido.getId(), pedido.getValorTotal(), pedido.getDataCompra(), pedido.getStatusPedido(),
-                pedido.getComprador().getId(), pedido.getVendedor().getId(), 
+                pedido.getComprador().getId(),
                 pedido.getProdutos()
                         .stream()
-                        .map(produtoPedido -> new DadosProdutoPedido(produtoPedido))
+                        .map(DadosProdutoPedido::new)
                         .toList());
     }
 }

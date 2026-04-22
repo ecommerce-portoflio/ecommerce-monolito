@@ -7,8 +7,10 @@ import br.com.ecommerce.model.pedido.DadosCadastroPedido;
 import br.com.ecommerce.model.pedido.DadosPedido;
 import br.com.ecommerce.model.usuario.Usuario;
 import br.com.ecommerce.service.PedidoService;
+import jakarta.validation.Valid;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +34,7 @@ public class PedidoController {
     }
 
     @PostMapping
-    public ResponseEntity<DadosPedido> fazerPedido(@RequestBody DadosCadastroPedido dto,
+    public ResponseEntity<DadosPedido> fazerPedido(@Valid @RequestBody DadosCadastroPedido dto,
             @AuthenticationPrincipal Usuario usuario, UriComponentsBuilder uriBuilder) {
         var pedido = pedidoService.fazerPedidoProdutoUnico(dto, usuario);
 
@@ -42,6 +44,20 @@ public class PedidoController {
                 .toUri();
 
         return ResponseEntity.created(uri).body(pedido);
+    }
+
+    @PostMapping("/carrinho")
+    public ResponseEntity<DadosPedido> fazerPedidoCarrinho(@AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(pedidoService.fazerPedidoCarrinho(usuario));
+    }
+
+//    A diferença entre esse endpoint e o de carrinho é que o usuário pode querer comprar vários,
+//    mas não todos os produtos de seu carrinho. Assim, ele compra alguns e os mesmos são removidos
+//    do carrinho.
+    @PostMapping("/varios")
+    public ResponseEntity<DadosPedido> fazerPedidoVarios(@AuthenticationPrincipal Usuario usuario,
+                                                         @RequestBody List<DadosCadastroPedido> dto) {
+        return ResponseEntity.ok(pedidoService.fazerPedidoVarios(usuario, dto));
     }
 
     // Esse endpoint simula apenas o recebimento, não contém nenhuma API real de

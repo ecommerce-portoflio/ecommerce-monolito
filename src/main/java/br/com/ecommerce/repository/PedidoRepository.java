@@ -18,13 +18,12 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
             FROM Pedido p
             WHERE p.id = :id
             """)
-    @EntityGraph(attributePaths = { "produtos", "vendedor", "comprador" })
+    @EntityGraph(attributePaths = { "produtos", "comprador" })
     Optional<Pedido> findByIdComProdutosEUsuarios(@Param(value = "id")Long id);
 
-    @EntityGraph(attributePaths = { "produtos", "vendedor", "comprador" })
+    @EntityGraph(attributePaths = { "produtos", "comprador" })
     Page<Pedido> findByComprador(Usuario usuario, Pageable pageable);
 
-    @EntityGraph(attributePaths = { "produtos", "vendedor", "comprador" })
-    Page<Pedido> findByVendedor(Usuario usuario, Pageable pageable);
+
 }
 

@@ -6,7 +6,6 @@ import br.com.ecommerce.model.carrinho.ProdutoCarrinho;
 import br.com.ecommerce.model.produto.Produto;
 import br.com.ecommerce.repository.ProdutoCarrinhoRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import br.com.ecommerce.model.carrinho.Carrinho;
@@ -16,7 +15,6 @@ import br.com.ecommerce.repository.CarrinhoRepository;
 import br.com.ecommerce.repository.ProdutoRepository;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
 @Service
 public class CarrinhoService {
@@ -35,6 +33,8 @@ public class CarrinhoService {
         Carrinho carrinho = retornaCarrinho(usuario);
         var produto = produtoRepository.findByIdAndAtivo(dto.idProduto(), true)
                 .orElseThrow(() -> new RegraDeNegocioException("Produto não encontrado!"));
+
+        validacoesAdicionarProdutoCarrinho(produto, usuario, dto);
 
         carrinho.adicionarProduto(produto, dto.quantidade());
     }
@@ -65,4 +65,11 @@ public class CarrinhoService {
         return carrinhoRepository.findByUsuario(usuario);
     }
 
+    private void validacoesAdicionarProdutoCarrinho(Produto produto, Usuario usuario, DadosCadastroProdutoCarrinho dto) {
+        if (produto.getVendedor().getId() == usuario.getId())
+            throw new RegraDeNegocioException("Você não pode adicionar seu próprio produto no carrinho!");
+
+        if (produto.getQuantidadeEstoque() < dto.quantidade())
+            throw new RegraDeNegocioException("A quantidade desejada não está disponível para o atual estoque do produto!");
+    }
 }

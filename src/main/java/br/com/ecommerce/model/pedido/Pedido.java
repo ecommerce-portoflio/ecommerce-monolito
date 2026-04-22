@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.ecommerce.model.carrinho.Carrinho;
 import br.com.ecommerce.model.produto.Produto;
 import br.com.ecommerce.model.usuario.Usuario;
 import jakarta.persistence.CascadeType;
@@ -41,20 +42,37 @@ public class Pedido {
     @JoinColumn(name = "comprador_id", nullable = false)
     private Usuario comprador;
 
-    @ManyToOne
-    @JoinColumn(name = "vendedor_id", nullable = false)
-    private Usuario vendedor;
-
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProdutoPedido> produtos = new ArrayList<>();
 
     // Pedido de um produto só
     public Pedido(Produto produto, Usuario comprador, Integer quantidade) {
         this.comprador = comprador;
-        this.vendedor = produto.getVendedor();
         this.statusPedido = StatusPedido.AGUARDANDO_PAGAMENTO;
         this.valorTotal = produto.getValor().multiply(BigDecimal.valueOf(quantidade));
         this.produtos.add(new ProdutoPedido(produto, this, quantidade));
         // Data da compra só é preenchida após pagamento
+    }
+
+//    Pedido a partir de um carrinho
+    public Pedido(Carrinho carrinho) {
+        comprador = carrinho.getUsuario();
+        statusPedido = StatusPedido.AGUARDANDO_PAGAMENTO;
+        valorTotal = carrinho.getTotal();
+        carrinho.getProdutos().forEach(produtoCarrinho -> produtos
+                .add(new ProdutoPedido(produtoCarrinho.getProduto(), this, produtoCarrinho.getQuantidade())));
+    }
+
+//    Pedido a partir de múltiplos produtos
+    public Pedido(Usuario usuario) {
+        comprador = usuario;
+        statusPedido = StatusPedido.AGUARDANDO_PAGAMENTO;
+        valorTotal = BigDecimal.ZERO;
+    }
+
+    public void acrescentarProduto(Produto produto, Integer quantidade) {
+        produtos.add(new ProdutoPedido(produto, this, quantidade));
+        valorTotal = valorTotal.add(produto.getValor()
+                .multiply(BigDecimal.valueOf(quantidade)));
     }
 }
