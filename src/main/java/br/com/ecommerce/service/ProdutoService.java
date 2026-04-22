@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class ProdutoService {
     private final ProdutoRepository repository;
@@ -33,7 +35,7 @@ public class ProdutoService {
 
     public DadosProduto buscarPorId(Long id) {
         var produto = repository.findByIdAndAtivo(id, true)
-            .orElseThrow(() -> new RegraDeNegocioException("Produto não encontrado!"));
+                .orElseThrow(() -> new RegraDeNegocioException("Produto não encontrado!"));
         return new DadosProduto(produto);
     }
 
@@ -55,16 +57,34 @@ public class ProdutoService {
     public DadosProduto atualizar(DadosAtualizarProduto dto, Usuario logado) {
         var produto = repository.findById(dto.id())
                 .orElseThrow(() -> new RegraDeNegocioException("Produto não encontrado!"));
-        if (!produto.getVendedor().getId().equals(logado.getId()))
+        if (!produto.getVendedor().getId().equals(logado.getId()) &&
+                !Objects.equals(logado.getRole(), "ROLE_ADMIN"))
             throw new RegraDeNegocioException("Você não tem permissão para atualizar este produto!");
         produto.atualizar(dto);
         return new DadosProduto(produto);
     }
 
     @Transactional
-    public void deletar(Long id) {
+    public void deletar(Long id, Usuario usuario) {
         var produto = repository.findById(id)
                 .orElseThrow(() -> new RegraDeNegocioException("Produto não encontrado!"));
+
+        if (!Objects.equals(produto.getVendedor().getId(), usuario.getId()) &&
+                !Objects.equals(usuario.getRole(), "ROLE_ADMIN"))
+            throw new RegraDeNegocioException("Você não tem permissão para alterar este produto!");
+
         produto.setAtivo(false);
+    }
+
+    @Transactional
+    public void reativar(Long id, Usuario usuario) {
+        var produto = repository.findById(id)
+                .orElseThrow(() -> new RegraDeNegocioException("Produto não encontrado!"));
+
+        if (!Objects.equals(produto.getVendedor().getId(), usuario.getId()) &&
+                !Objects.equals(usuario.getRole(), "ROLE_ADMIN"))
+            throw new RegraDeNegocioException("Você não tem permissão para alterar este produto!");
+
+        produto.setAtivo(true);
     }
 }
