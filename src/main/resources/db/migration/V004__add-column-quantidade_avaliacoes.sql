@@ -1,0 +1,2 @@
+ALTER TABLE produtos
+ADD COLUMN quantidade_avaliacoes INTEGER NOT NULL DEFAULT 0;

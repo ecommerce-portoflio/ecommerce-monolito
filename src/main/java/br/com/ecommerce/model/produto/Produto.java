@@ -33,6 +33,7 @@ public class Produto {
     private Integer quantidadeEstoque;
     private BigDecimal valor;
     private Double mediaAvaliacoes;
+    private Integer quantidadeAvaliacoes;
     private boolean ativo;
     
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "produto")
@@ -49,6 +50,8 @@ public class Produto {
         valor = dto.valor();
         vendedor = logado;
         ativo = true;
+        mediaAvaliacoes = 0.0;
+        quantidadeAvaliacoes = 0;
     }
 
     public void atualizar(DadosAtualizarProduto dto) {
@@ -60,5 +63,23 @@ public class Produto {
             this.quantidadeEstoque = dto.quantidadeEstoque();
         if (dto.valor() != null)
             this.valor = dto.valor();
+    }
+
+    public void avaliar(Double nota) {
+        double novaMedia = ((mediaAvaliacoes * quantidadeAvaliacoes) + nota) / (quantidadeAvaliacoes + 1);
+        quantidadeAvaliacoes++;
+        mediaAvaliacoes = novaMedia;
+    }
+
+    public void alterarAvaliacao(Avaliacao avaliacao, Double nota) {
+        mediaAvaliacoes = ((mediaAvaliacoes * quantidadeAvaliacoes) - avaliacao.getNota() + nota) / quantidadeAvaliacoes;
+    }
+
+    public void removerAvaliacao(Avaliacao avaliacao) {
+        if (quantidadeAvaliacoes == 1)
+            mediaAvaliacoes = 0.0;
+        else
+            mediaAvaliacoes = ((mediaAvaliacoes * quantidadeAvaliacoes) - avaliacao.getNota()) / quantidadeAvaliacoes - 1;
+        quantidadeAvaliacoes--;
     }
 }

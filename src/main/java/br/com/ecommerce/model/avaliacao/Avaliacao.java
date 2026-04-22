@@ -28,4 +28,10 @@ public class Avaliacao {
 
     @ManyToOne
     private Produto produto;
+
+    public Avaliacao(Usuario usuario, Double nota, Produto produto) {
+        avaliador = usuario;
+        this.nota = nota;
+        this.produto = produto;
+    }
 }

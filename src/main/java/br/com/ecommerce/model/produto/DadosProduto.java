@@ -8,9 +8,12 @@ public record DadosProduto(
     String descricao,
     Integer quantidadeEstoque,
     BigDecimal valor,
-    Long idVendedor
+    Long idVendedor,
+    Double mediaAvaliacoes,
+    Integer quantidadeAvaliacoes
 ) {
     public DadosProduto(Produto produto) {
-        this(produto.getId(), produto.getNome(), produto.getDescricao(), produto.getQuantidadeEstoque(), produto.getValor(), produto.getVendedor().getId());
+        this(produto.getId(), produto.getNome(), produto.getDescricao(), produto.getQuantidadeEstoque(), produto.getValor(),
+                produto.getVendedor().getId(), produto.getMediaAvaliacoes(), produto.getQuantidadeAvaliacoes());
     }
 }
