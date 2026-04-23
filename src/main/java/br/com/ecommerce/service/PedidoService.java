@@ -98,7 +98,7 @@ public class PedidoService {
     public DadosPedido buscarPedido(Long idPedido, Usuario logado) {
         var pedido = buscaPedido(idPedido);
 
-        if (pedido.getComprador().getId() != logado.getId())
+        if (!Objects.equals(pedido.getComprador().getId(), logado.getId()))
             throw new RegraDeNegocioException("Você não tem acesso a esse pedido!");
 
         return new DadosPedido(pedido);
@@ -149,7 +149,7 @@ public class PedidoService {
     }
 
     private void validacoesCancelamentoPedido(Pedido pedido, Usuario comprador) {
-        if (pedido.getComprador().getId() != comprador.getId())
+        if (!Objects.equals(pedido.getComprador().getId(), comprador.getId()))
             throw new RegraDeNegocioException("Você não tem acesso a esse produto!");
 
         if (pedido.getStatusPedido() == StatusPedido.ENTREGUE || pedido.getStatusPedido() == StatusPedido.PAGO)
@@ -174,7 +174,7 @@ public class PedidoService {
     }
 
     private void validacoesPagamento(Pedido pedido, Usuario comprador) {
-        if (pedido.getComprador().getId() != comprador.getId())
+        if (!Objects.equals(pedido.getComprador().getId(), comprador.getId()))
             throw new RegraDeNegocioException("Você não tem acesso a esse pedido!");
 
         if (pedido.getStatusPedido() != StatusPedido.AGUARDANDO_PAGAMENTO)
@@ -189,7 +189,7 @@ public class PedidoService {
     }
 
     private void validacoesPedidoCarrinho(Carrinho carrinho) {
-        if (carrinho.getProdutos().size() == 0)
+        if (carrinho.getProdutos().isEmpty())
             throw new RegraDeNegocioException("Você não tem produtos no carrinho!");
 
 //        A validação de estoque do produto é feita

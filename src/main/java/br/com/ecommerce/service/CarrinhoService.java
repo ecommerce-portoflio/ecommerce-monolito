@@ -15,6 +15,7 @@ import br.com.ecommerce.repository.CarrinhoRepository;
 import br.com.ecommerce.repository.ProdutoRepository;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Service
 public class CarrinhoService {
@@ -66,7 +67,7 @@ public class CarrinhoService {
     }
 
     private void validacoesAdicionarProdutoCarrinho(Produto produto, Usuario usuario, DadosCadastroProdutoCarrinho dto) {
-        if (produto.getVendedor().getId() == usuario.getId())
+        if (Objects.equals(produto.getVendedor().getId(), usuario.getId()))
             throw new RegraDeNegocioException("Você não pode adicionar seu próprio produto no carrinho!");
 
         if (produto.getQuantidadeEstoque() < dto.quantidade())

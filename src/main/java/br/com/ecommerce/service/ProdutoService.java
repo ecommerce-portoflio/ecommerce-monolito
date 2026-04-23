@@ -55,7 +55,7 @@ public class ProdutoService {
 
     @Transactional
     public DadosProduto atualizar(DadosAtualizarProduto dto, Usuario logado) {
-        var produto = repository.findById(dto.id())
+        var produto = repository.findByIdAndAtivo(dto.id(), true)
                 .orElseThrow(() -> new RegraDeNegocioException("Produto não encontrado!"));
         if (!produto.getVendedor().getId().equals(logado.getId()) &&
                 !Objects.equals(logado.getRole(), "ROLE_ADMIN"))
@@ -66,7 +66,7 @@ public class ProdutoService {
 
     @Transactional
     public void deletar(Long id, Usuario usuario) {
-        var produto = repository.findById(id)
+        var produto = repository.findByIdAndAtivo(id, true)
                 .orElseThrow(() -> new RegraDeNegocioException("Produto não encontrado!"));
 
         if (!Objects.equals(produto.getVendedor().getId(), usuario.getId()) &&
