@@ -8,32 +8,23 @@ import br.com.ecommerce.repository.UsuarioRepository;
 import br.com.ecommerce.service.TokenService;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class UsuarioControllerTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class UsuarioControllerTest extends AbstractIntegrationTest {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
-
-    @LocalServerPort
-    private int port;
 
     @Autowired
     public UsuarioControllerTest(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, TokenService tokenService) {
@@ -43,24 +34,13 @@ public class UsuarioControllerTest {
     }
 
     @BeforeEach
-    void setup() {
-        RestAssured.baseURI = "http://localhost:" + port + "/";
+    void limpaBanco() {
         usuarioRepository.deleteAll();
     }
 
-    @Container
-    static PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:14")
-                    .withDatabaseName("testdb")
-                    .withUsername("admin")
-                    .withPassword("admin");
-
-    @DynamicPropertySource
-    static void configurarProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("app.secret", () -> "Valor-secret");
+    @AfterAll
+    void limpaBancoNovamente() {
+        usuarioRepository.deleteAll();
     }
 
     @WithAnonymousUser
