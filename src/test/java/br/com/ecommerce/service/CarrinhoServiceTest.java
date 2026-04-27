@@ -1,7 +1,6 @@
 package br.com.ecommerce.service;
 
 import br.com.ecommerce.infra.exception.RegraDeNegocioException;
-import br.com.ecommerce.model.carrinho.Carrinho;
 import br.com.ecommerce.model.carrinho.DadosCadastroProdutoCarrinho;
 import br.com.ecommerce.model.carrinho.ProdutoCarrinho;
 import br.com.ecommerce.model.produto.DadosCadastroProduto;

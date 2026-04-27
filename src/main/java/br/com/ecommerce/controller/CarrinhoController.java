@@ -1,6 +1,5 @@
 package br.com.ecommerce.controller;
 
-import br.com.ecommerce.model.carrinho.Carrinho;
 import br.com.ecommerce.model.carrinho.DadosCarrinho;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

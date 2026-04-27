@@ -1,7 +1,5 @@
 package br.com.ecommerce.model.carrinho;
 
-import br.com.ecommerce.model.produto.DadosProduto;
-
 import java.math.BigDecimal;
 import java.util.List;
 

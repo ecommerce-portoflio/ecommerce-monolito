@@ -38,4 +38,5 @@ jobs:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SECRET: ${{ secrets.SECRET }}
+          DB_URL: ${{ secrets.DB_URL }}
         run: mvn -B test
