@@ -58,7 +58,8 @@ public class CarrinhoService {
     @Transactional
     public void esvaziarCarrinho(Usuario usuario) {
         Carrinho carrinho = retornaCarrinho(usuario);
-        produtoCarrinhoRepository.deleteAllByCarrinho(carrinho);
+//        produtoCarrinhoRepository.deleteByCarrinho(carrinho);
+        carrinho.getProdutos().clear();
         carrinho.setTotal(BigDecimal.ZERO);
     }
 

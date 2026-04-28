@@ -190,8 +190,9 @@ public class CarrinhoServiceTest {
 
         carrinhoService.esvaziarCarrinho(usuario);
 
-        verify(produtoCarrinhoRepository).deleteAllByCarrinho(usuario.getCarrinho());
+//        verify(produtoCarrinhoRepository).deleteAllByCarrinho(usuario.getCarrinho());
         assertEquals(0, usuario.getCarrinho().getTotal().compareTo(BigDecimal.ZERO));
+        assertEquals(0, usuario.getCarrinho().getProdutos().size());
     }
 
     Usuario criaUsuario(Long id) {
