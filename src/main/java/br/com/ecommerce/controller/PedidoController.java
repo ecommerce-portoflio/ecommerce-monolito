@@ -47,8 +47,16 @@ public class PedidoController {
     }
 
     @PostMapping("/carrinho")
-    public ResponseEntity<DadosPedido> fazerPedidoCarrinho(@AuthenticationPrincipal Usuario usuario) {
-        return ResponseEntity.ok(pedidoService.fazerPedidoCarrinho(usuario));
+    public ResponseEntity<DadosPedido> fazerPedidoCarrinho(@AuthenticationPrincipal Usuario usuario,
+                                                           UriComponentsBuilder uriBuilder) {
+        var pedido = pedidoService.fazerPedidoCarrinho(usuario);
+
+        URI uri = uriBuilder
+                .path("/pedido/{id}")
+                .buildAndExpand(pedido.id())
+                .toUri();
+
+        return ResponseEntity.created(uri).body(pedido);
     }
 
 //    A diferença entre esse endpoint e o de carrinho é que o usuário pode querer comprar vários,
@@ -56,8 +64,16 @@ public class PedidoController {
 //    do carrinho.
     @PostMapping("/varios")
     public ResponseEntity<DadosPedido> fazerPedidoVarios(@AuthenticationPrincipal Usuario usuario,
-                                                         @RequestBody List<DadosCadastroPedido> dto) {
-        return ResponseEntity.ok(pedidoService.fazerPedidoVarios(usuario, dto));
+                                                         @RequestBody List<DadosCadastroPedido> dto,
+                                                         UriComponentsBuilder uriBuilder) {
+        var pedido = pedidoService.fazerPedidoVarios(usuario, dto);
+
+        URI uri = uriBuilder
+                .path("/pedido/{id}")
+                .buildAndExpand(pedido.id())
+                .toUri();
+
+        return ResponseEntity.created(uri).body(pedido);
     }
 
     // Esse endpoint simula apenas o recebimento, não contém nenhuma API real de
