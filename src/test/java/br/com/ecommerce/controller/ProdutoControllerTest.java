@@ -51,8 +51,9 @@ public class ProdutoControllerTest extends AbstractIntegrationTest {
     }
 
     @AfterAll
-    void limpaBancoNovamente() {
+    void limpaDados() {
         limpaBanco();
+        usuarioRepository.deleteAll();
     }
 
     @Test
@@ -82,7 +83,6 @@ public class ProdutoControllerTest extends AbstractIntegrationTest {
         assertEquals(usuarioLogado.getId(), response.jsonPath().getLong("idVendedor"));
     }
 
-    @WithMockUser
     @Test
     void deveBuscarTodos() {
         Usuario usuarioLogado = usuarioRepository.findByEmailIgnoreCase("email1@email.com").get();
