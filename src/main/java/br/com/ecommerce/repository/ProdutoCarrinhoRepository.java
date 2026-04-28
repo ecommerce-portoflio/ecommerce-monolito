@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProdutoCarrinhoRepository extends JpaRepository<ProdutoCarrinho, Long> {
-    void deleteAllByCarrinho(Carrinho carrinho);
-
     Optional<ProdutoCarrinho> findByProdutoAndCarrinho(Produto produto, Carrinho carrinho);
 
     List<ProdutoCarrinho> findByCarrinhoAndProdutoIn(Carrinho carrinho, List<Produto> listaProdutos);
