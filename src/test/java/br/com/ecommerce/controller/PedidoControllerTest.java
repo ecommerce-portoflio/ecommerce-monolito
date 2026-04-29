@@ -23,7 +23,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PedidoControllerTest extends AbstractIntegrationTest{
     private final PedidoRepository pedidoRepository;
     private final UsuarioRepository usuarioRepository;
@@ -53,7 +52,7 @@ public class PedidoControllerTest extends AbstractIntegrationTest{
         this.tokenService = tokenService;
     }
 
-    @BeforeAll
+    @BeforeEach
     void populaDados() {
         var usuario1 = new Usuario(new DadosCadastroUsuario("Nome 1", "email1@email.com", "Senha_123",
                 "11 999999999", "123.456.789-00", TipoPessoa.PESSOA_FISICA), encoder.encode("Senha_123"));
@@ -71,21 +70,6 @@ public class PedidoControllerTest extends AbstractIntegrationTest{
                 1000, BigDecimal.TEN), usuario2);
         idProduto1 = produtoRepository.save(produto1).getId();
         idProduto2 = produtoRepository.save(produto2).getId();
-    }
-
-    @BeforeEach
-    void limpaPedidos() {
-        pedidoRepository.deleteAll();
-    }
-
-    @AfterAll
-    void limpaAlteracoes() {
-        produtoCarrinhoRepository.deleteAll();
-        produtoPedidoRepository.deleteAll();
-        pedidoRepository.deleteAll();
-        carrinhoRepository.deleteAll();
-        produtoRepository.deleteAll();
-        usuarioRepository.deleteAll();
     }
 
     @Test

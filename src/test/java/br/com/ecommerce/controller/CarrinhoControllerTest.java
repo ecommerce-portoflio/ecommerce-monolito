@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CarrinhoControllerTest extends AbstractIntegrationTest{
     private final UsuarioRepository usuarioRepository;
     private final CarrinhoRepository carrinhoRepository;
@@ -44,7 +43,7 @@ public class CarrinhoControllerTest extends AbstractIntegrationTest{
         this.tokenService = tokenService;
     }
 
-    @BeforeAll
+    @BeforeEach
     void populaDados() {
         var usuario1 = new Usuario(new DadosCadastroUsuario("Nome 1", "email1@email.com", "Senha_123",
                 "11 999999999", "123.456.789-00", TipoPessoa.PESSOA_FISICA), encoder.encode("Senha_123"));
@@ -62,25 +61,6 @@ public class CarrinhoControllerTest extends AbstractIntegrationTest{
                 1000, BigDecimal.TEN), usuario2);
         idProduto1 = produtoRepository.save(produto1).getId();
         idProduto2 = produtoRepository.save(produto2).getId();
-    }
-
-    @BeforeEach
-    void limpaDados() {
-        produtoCarrinhoRepository.deleteAll();
-        var carrinho = carrinhoRepository.findByUsuario(
-                usuarioRepository.findByEmailIgnoreCase("email3@email.com")
-                        .get());
-        carrinho.setTotal(BigDecimal.ZERO);
-
-        carrinhoRepository.save(carrinho);
-    }
-
-    @AfterAll
-    void excluiTodosOsDados() {
-        produtoCarrinhoRepository.deleteAll();
-        produtoRepository.deleteAll();
-        carrinhoRepository.deleteAll();
-        usuarioRepository.deleteAll();
     }
 
     @Test
