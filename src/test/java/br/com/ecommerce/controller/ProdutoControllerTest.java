@@ -20,7 +20,6 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ProdutoControllerTest extends AbstractIntegrationTest {
     private final ProdutoRepository produtoRepository;
     private final UsuarioRepository usuarioRepository;
@@ -35,7 +34,7 @@ public class ProdutoControllerTest extends AbstractIntegrationTest {
         this.tokenService = tokenService;
     }
 
-    @BeforeAll
+    @BeforeEach
     void criaUsuarios() {
         var usuario1 = new Usuario(new DadosCadastroUsuario("Nome 1", "email1@email.com", "Senha_123",
                 "11 999999999", "123.456.789-00", TipoPessoa.PESSOA_FISICA), encoder.encode("Senha_123"));
@@ -43,17 +42,6 @@ public class ProdutoControllerTest extends AbstractIntegrationTest {
                 "11 999999998", "123.456.789-99", TipoPessoa.PESSOA_FISICA), encoder.encode("Senha_123"));
         usuarioRepository.save(usuario1);
         usuarioRepository.save(usuario2);
-    }
-
-    @BeforeEach
-    void limpaBanco() {
-        produtoRepository.deleteAll();
-    }
-
-    @AfterAll
-    void limpaDados() {
-        limpaBanco();
-        usuarioRepository.deleteAll();
     }
 
     @Test

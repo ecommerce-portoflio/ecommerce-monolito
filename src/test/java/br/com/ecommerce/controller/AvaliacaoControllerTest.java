@@ -44,7 +44,7 @@ public class AvaliacaoControllerTest extends AbstractIntegrationTest{
     }
 
     @BeforeEach
-    void limpaAvaliacoes() {
+    void populaDados() {
         avaliacaoRepository.deleteAll();
         produtoRepository.deleteAll();
         usuarioRepository.deleteAll();

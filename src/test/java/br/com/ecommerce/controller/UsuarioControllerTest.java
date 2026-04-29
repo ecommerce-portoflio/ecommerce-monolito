@@ -20,7 +20,6 @@ import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingExcept
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UsuarioControllerTest extends AbstractIntegrationTest {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -33,19 +32,9 @@ public class UsuarioControllerTest extends AbstractIntegrationTest {
         this.tokenService = tokenService;
     }
 
-    @BeforeEach
-    void limpaBanco() {
-        usuarioRepository.deleteAll();
-    }
-
-    @AfterAll
-    void limpaBancoNovamente() {
-        usuarioRepository.deleteAll();
-    }
-
     @WithAnonymousUser
     @Test
-    void deveRegistrarUsuario() throws JsonProcessingException {
+    void deveRegistrarUsuario() {
         DadosCadastroUsuario dto = new DadosCadastroUsuario("Usuário nome", "email@email.com", "Senha_9090",
                 "11 900000000", "123.456.789-00", TipoPessoa.PESSOA_FISICA);
 
