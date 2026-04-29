@@ -25,14 +25,14 @@ public class AvaliacaoService {
         Produto produto = produtoRepository.findByIdAndAtivo(dto.idProduto(), true)
                 .orElseThrow(() -> new RegraDeNegocioException("Produto não encontrado!"));
         var avaliacaoBD = avaliacaoRepository.findByAvaliadorAndProduto(usuario, produto);
+
         if (avaliacaoBD.isPresent()) {
-            produto.alterarAvaliacao(avaliacaoBD.get(), dto.nota());
+             produto.alterarAvaliacao(avaliacaoBD.get(), dto.nota());
             avaliacaoBD.get().setNota(dto.nota());
         }
         else {
             Avaliacao avaliacao = new Avaliacao(usuario, dto.nota(), produto);
-            avaliacaoRepository.save(avaliacao);
-            produto.avaliar(dto.nota());
+            produto.avaliar(avaliacao);
         }
     }
 
@@ -44,6 +44,5 @@ public class AvaliacaoService {
                 .orElseThrow(() -> new RegraDeNegocioException("Você não avaliou esse produto!"));
 
         produto.removerAvaliacao(avaliacao);
-        avaliacaoRepository.delete(avaliacao);
     }
 }

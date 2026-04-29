@@ -1,21 +1,13 @@
 package br.com.ecommerce.model.produto;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.ecommerce.model.avaliacao.Avaliacao;
 import br.com.ecommerce.model.usuario.Usuario;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,7 +29,7 @@ public class Produto {
     private Integer quantidadeAvaliacoes;
     private boolean ativo;
     
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "produto")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "produto", orphanRemoval = true)
     private List<Avaliacao> avaliacoes = new ArrayList<>();
     
     @ManyToOne(fetch = FetchType.LAZY)
@@ -66,21 +58,35 @@ public class Produto {
             this.valor = dto.valor();
     }
 
-    public void avaliar(Double nota) {
-        double novaMedia = ((mediaAvaliacoes * quantidadeAvaliacoes) + nota) / (quantidadeAvaliacoes + 1);
+    public void avaliar(Avaliacao avaliacao) {
+        avaliacoes.add(avaliacao);
+        double novaMedia = ((mediaAvaliacoes * quantidadeAvaliacoes) + avaliacao.getNota()) / (quantidadeAvaliacoes + 1);
         quantidadeAvaliacoes++;
-        mediaAvaliacoes = novaMedia;
+        mediaAvaliacoes = arrendonda2Casas(novaMedia);
     }
 
     public void alterarAvaliacao(Avaliacao avaliacao, Double nota) {
-        mediaAvaliacoes = ((mediaAvaliacoes * quantidadeAvaliacoes) - avaliacao.getNota() + nota) / quantidadeAvaliacoes;
+        double novaMedia = ((mediaAvaliacoes * quantidadeAvaliacoes) - avaliacao.getNota() + nota) / quantidadeAvaliacoes;
+        mediaAvaliacoes = arrendonda2Casas(novaMedia);
     }
 
     public void removerAvaliacao(Avaliacao avaliacao) {
+        avaliacoes.remove(avaliacao);
+        avaliacao.setProduto(null);
+
         if (quantidadeAvaliacoes == 1)
             mediaAvaliacoes = 0.0;
-        else
-            mediaAvaliacoes = ((mediaAvaliacoes * quantidadeAvaliacoes) - avaliacao.getNota()) / quantidadeAvaliacoes - 1;
+        else {
+            double novaMedia = ((mediaAvaliacoes * quantidadeAvaliacoes) - avaliacao.getNota()) / (quantidadeAvaliacoes - 1);
+            mediaAvaliacoes = arrendonda2Casas(novaMedia);
+        }
         quantidadeAvaliacoes--;
+    }
+
+    private double arrendonda2Casas(double novaMedia) {
+        return BigDecimal
+                .valueOf(novaMedia)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 }
