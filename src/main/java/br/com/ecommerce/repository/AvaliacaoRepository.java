@@ -10,7 +10,5 @@ import java.util.Optional;
 
 public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Long> {
     Optional<Avaliacao> findByAvaliadorAndProduto(Usuario usuario, Produto produto);
-
-    int deleteByAvaliadorAndProduto(Usuario usuario, Produto produto);
 }
 

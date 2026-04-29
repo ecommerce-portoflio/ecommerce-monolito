@@ -30,4 +30,6 @@ public class AvaliacaoController {
         avaliacaoService.removerAvaliacao(usuario, idProduto);
         return ResponseEntity.ok("Avaliação excluída!");
     }
+
+//    TODO: Buscar meus produtos avaliados
 }

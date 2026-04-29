@@ -10,8 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByEmailIgnoreCase(String email);
 
-    boolean existsByEmailIgnoreCaseOrDocumentoIgnoreCase(String email, String documento);
-
     @Query("""
             SELECT COUNT(u) > 0
             FROM Usuario u
