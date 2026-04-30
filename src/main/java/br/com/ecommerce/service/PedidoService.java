@@ -26,13 +26,15 @@ public class PedidoService {
     private final CarrinhoRepository carrinhoRepository;
     private final ProdutoPedidoRepository produtoPedidoRepository;
     private final ProdutoCarrinhoRepository produtoCarrinhoRepository;
+    private final EmailService emailService;
 
-    public PedidoService(PedidoRepository pedidoRepository, ProdutoRepository prdoutoRepository, CarrinhoRepository carrinhoRepository, ProdutoPedidoRepository produtoPedidoRepository, ProdutoCarrinhoRepository produtoCarrinhoRepository) {
+    public PedidoService(PedidoRepository pedidoRepository, ProdutoRepository prdoutoRepository, CarrinhoRepository carrinhoRepository, ProdutoPedidoRepository produtoPedidoRepository, ProdutoCarrinhoRepository produtoCarrinhoRepository, EmailService emailService) {
         this.pedidoRepository = pedidoRepository;
         this.produtoRepository = prdoutoRepository;
         this.carrinhoRepository = carrinhoRepository;
         this.produtoPedidoRepository = produtoPedidoRepository;
         this.produtoCarrinhoRepository = produtoCarrinhoRepository;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -44,7 +46,8 @@ public class PedidoService {
         Pedido pedido = new Pedido(produto, usuarioLogado, dto.quantidade());
         pedidoRepository.save(pedido);
         produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - dto.quantidade());
-        // TODO: Rotina para enviar e-mail aos usuários (comprador e vendedor)
+        emailService.enviarEmailSimples(usuarioLogado.getEmail(),
+                "Pedido feito", "Seu pedido foi recebido por nós!\nPara prosseguir, conclua o pagamento dele.");
         return new DadosPedido(pedido);
     }
 
@@ -62,6 +65,9 @@ public class PedidoService {
 
         carrinho.getProdutos().clear();
         carrinho.setTotal(BigDecimal.ZERO);
+
+        emailService.enviarEmailSimples(usuario.getEmail(),
+                "Pedido feito", "Seu pedido foi recebido por nós!\nPara prosseguir, conclua o pagamento dele.");
 
         return new DadosPedido(pedido);
     }
@@ -92,6 +98,9 @@ public class PedidoService {
             carrinho.getProdutos().remove(produtoCarrinho);
         });
 
+        emailService.enviarEmailSimples(usuario.getEmail(),
+                "Pedido feito", "Seu pedido foi recebido por nós!\nPara prosseguir, conclua o pagamento dele.");
+
         return new DadosPedido(pedidoRepository.save(pedido));
     }
 
@@ -111,7 +120,8 @@ public class PedidoService {
 
         pedido.setStatusPedido(StatusPedido.PAGO);
         pedido.setDataCompra(LocalDateTime.now());
-        // TODO: Rotina para enviar e-mail ao usuário
+        emailService.enviarEmailSimples(usuario.getEmail(),
+                "Pagamento feito", "Seu pagamento foi recebido por nós!\nAgradecemos a preferência!");
     }
 
     @Transactional
@@ -119,8 +129,8 @@ public class PedidoService {
         var pedido = buscaPedido(idPedido);
         validacoesEntrega(pedido);
         pedido.setStatusPedido(StatusPedido.ENTREGUE);
-        // TODO: Rotina para enviar email avisando o comprador
-        // pedido.getComprador().getEmail()
+        emailService.enviarEmailSimples(pedido.getComprador().getEmail(),
+                "Pedido Entregue", "Seu pedido foi entregue!");
     }
 
     public Page<DadosPedido> buscarMeusPedidos(Usuario usuario, Pageable pageable) {
