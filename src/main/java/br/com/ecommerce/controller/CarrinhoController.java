@@ -37,8 +37,6 @@ public class CarrinhoController {
         return ResponseEntity.ok("Produto removido do carrinho!");
     }
 
-//    TODO: Remover lista de produtos do carrinho
-
     @DeleteMapping("/todos")
     public ResponseEntity<String> esvaziarCarrinho(@AuthenticationPrincipal Usuario usuario) {
         carrinhoService.esvaziarCarrinho(usuario);

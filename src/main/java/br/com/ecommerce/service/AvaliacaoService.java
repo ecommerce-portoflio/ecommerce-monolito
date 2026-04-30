@@ -2,12 +2,15 @@ package br.com.ecommerce.service;
 
 import br.com.ecommerce.infra.exception.RegraDeNegocioException;
 import br.com.ecommerce.model.avaliacao.Avaliacao;
+import br.com.ecommerce.model.avaliacao.DadosAvaliacao;
 import br.com.ecommerce.model.avaliacao.DadosCadastroAvaliacao;
 import br.com.ecommerce.model.produto.Produto;
 import br.com.ecommerce.model.usuario.Usuario;
 import br.com.ecommerce.repository.AvaliacaoRepository;
 import br.com.ecommerce.repository.ProdutoRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -44,5 +47,9 @@ public class AvaliacaoService {
                 .orElseThrow(() -> new RegraDeNegocioException("Você não avaliou esse produto!"));
 
         produto.removerAvaliacao(avaliacao);
+    }
+
+    public Page<DadosAvaliacao> buscarAvaliacoes(Usuario usuario, Pageable pageable) {
+        return avaliacaoRepository.findAllByAvaliador(usuario, pageable);
     }
 }
