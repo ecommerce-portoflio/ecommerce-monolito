@@ -27,9 +27,7 @@ public class PedidoControllerTest extends AbstractIntegrationTest{
     private final PedidoRepository pedidoRepository;
     private final UsuarioRepository usuarioRepository;
     private final ProdutoRepository produtoRepository;
-    private final ProdutoPedidoRepository produtoPedidoRepository;
     private final CarrinhoRepository carrinhoRepository;
-    private final ProdutoCarrinhoRepository produtoCarrinhoRepository;
 
     private final PedidoService pedidoService;
 
@@ -40,13 +38,11 @@ public class PedidoControllerTest extends AbstractIntegrationTest{
     private Long idProduto2;
 
     @Autowired
-    public PedidoControllerTest(PedidoRepository pedidoRepository, UsuarioRepository usuarioRepository, ProdutoRepository produtoRepository, ProdutoPedidoRepository produtoPedidoRepository, CarrinhoRepository carrinhoRepository, ProdutoCarrinhoRepository produtoCarrinhoRepository, PedidoService pedidoService, PasswordEncoder encoder, TokenService tokenService) {
+    public PedidoControllerTest(PedidoRepository pedidoRepository, UsuarioRepository usuarioRepository, ProdutoRepository produtoRepository, CarrinhoRepository carrinhoRepository, PedidoService pedidoService, PasswordEncoder encoder, TokenService tokenService) {
         this.pedidoRepository = pedidoRepository;
         this.usuarioRepository = usuarioRepository;
         this.produtoRepository = produtoRepository;
-        this.produtoPedidoRepository = produtoPedidoRepository;
         this.carrinhoRepository = carrinhoRepository;
-        this.produtoCarrinhoRepository = produtoCarrinhoRepository;
         this.pedidoService = pedidoService;
         this.encoder = encoder;
         this.tokenService = tokenService;
@@ -277,9 +273,9 @@ public class PedidoControllerTest extends AbstractIntegrationTest{
     void deveRetornarTodosOsPedidosDoUsuario() {
         var usuario = usuarioRepository.findByEmailIgnoreCase("email3@email.com").orElseThrow();
         var produto1 = produtoRepository.findByIdAndAtivo(idProduto1, true).orElseThrow();
-        var pedido1 = pedidoRepository.save(new Pedido(produto1, usuario, 5));
-        var pedido2 = pedidoRepository.save(new Pedido(produto1, usuario, 5));
-        var pedido3 = pedidoRepository.save(new Pedido(produto1, usuario, 5));
+        pedidoRepository.save(new Pedido(produto1, usuario, 5));
+        pedidoRepository.save(new Pedido(produto1, usuario, 5));
+        pedidoRepository.save(new Pedido(produto1, usuario, 5));
         var token = tokenService.gerarToken(usuario);
 
         var response = RestAssured
@@ -300,9 +296,9 @@ public class PedidoControllerTest extends AbstractIntegrationTest{
     void deveRetornarTodosOsPedidosVendidos() {
         var usuario = usuarioRepository.findByEmailIgnoreCase("email3@email.com").orElseThrow();
         var produto1 = produtoRepository.findByIdAndAtivo(idProduto1, true).orElseThrow();
-        var pedido1 = pedidoRepository.save(new Pedido(produto1, usuario, 5));
-        var pedido2 = pedidoRepository.save(new Pedido(produto1, usuario, 5));
-        var pedido3 = pedidoRepository.save(new Pedido(produto1, usuario, 5));
+        pedidoRepository.save(new Pedido(produto1, usuario, 5));
+        pedidoRepository.save(new Pedido(produto1, usuario, 5));
+        pedidoRepository.save(new Pedido(produto1, usuario, 5));
         var vendedor = usuarioRepository.findByEmailIgnoreCase("email1@email.com").orElseThrow();
         var token = tokenService.gerarToken(vendedor);
 

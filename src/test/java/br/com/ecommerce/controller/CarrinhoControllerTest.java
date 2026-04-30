@@ -7,7 +7,6 @@ import br.com.ecommerce.model.usuario.DadosCadastroUsuario;
 import br.com.ecommerce.model.usuario.TipoPessoa;
 import br.com.ecommerce.model.usuario.Usuario;
 import br.com.ecommerce.repository.CarrinhoRepository;
-import br.com.ecommerce.repository.ProdutoCarrinhoRepository;
 import br.com.ecommerce.repository.ProdutoRepository;
 import br.com.ecommerce.repository.UsuarioRepository;
 import br.com.ecommerce.service.TokenService;
@@ -24,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CarrinhoControllerTest extends AbstractIntegrationTest{
     private final UsuarioRepository usuarioRepository;
     private final CarrinhoRepository carrinhoRepository;
-    private final ProdutoCarrinhoRepository produtoCarrinhoRepository;
     private final ProdutoRepository produtoRepository;
 
     private final PasswordEncoder encoder;
@@ -34,10 +32,9 @@ public class CarrinhoControllerTest extends AbstractIntegrationTest{
     private Long idProduto2;
 
     @Autowired
-    public CarrinhoControllerTest(UsuarioRepository usuarioRepository, CarrinhoRepository carrinhoRepository, ProdutoCarrinhoRepository produtoCarrinhoRepository, ProdutoRepository produtoRepository, PasswordEncoder encoder, TokenService tokenService) {
+    public CarrinhoControllerTest(UsuarioRepository usuarioRepository, CarrinhoRepository carrinhoRepository, ProdutoRepository produtoRepository, PasswordEncoder encoder, TokenService tokenService) {
         this.usuarioRepository = usuarioRepository;
         this.carrinhoRepository = carrinhoRepository;
-        this.produtoCarrinhoRepository = produtoCarrinhoRepository;
         this.produtoRepository = produtoRepository;
         this.encoder = encoder;
         this.tokenService = tokenService;
