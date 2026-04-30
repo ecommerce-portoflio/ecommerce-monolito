@@ -11,8 +11,8 @@ jobs:
       postgres:
         image: postgres:14
         env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: admin
+          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
           POSTGRES_DB: ecommerce
         ports:
           - 5432:5432
