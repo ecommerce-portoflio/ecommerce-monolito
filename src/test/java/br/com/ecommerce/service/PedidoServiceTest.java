@@ -58,6 +58,9 @@ class PedidoServiceTest {
     @InjectMocks
     private PedidoService pedidoService;
 
+    @Mock
+    private EmailService emailService;
+
     private Usuario comprador;
     private Usuario vendedor;
 
@@ -80,6 +83,7 @@ class PedidoServiceTest {
         assertEquals(StatusPedido.AGUARDANDO_PAGAMENTO, resultado.statusPedido());
         assertEquals(3, produto.getQuantidadeEstoque());
         verify(pedidoRepository).save(any(Pedido.class));
+        verify(emailService).enviarEmailSimples(any(), any(), any());
     }
 
     @Test
@@ -139,6 +143,7 @@ class PedidoServiceTest {
         assertEquals(3, produto.getQuantidadeEstoque());
         assertTrue(carrinho.getProdutos().isEmpty());
         assertEquals(0, carrinho.getTotal().compareTo(BigDecimal.ZERO));
+        verify(emailService).enviarEmailSimples(any(), any(), any());
     }
 
     @Test
@@ -191,6 +196,7 @@ class PedidoServiceTest {
         assertEquals(8, produto.getQuantidadeEstoque());
         assertEquals(0, carrinho.getTotal().compareTo(BigDecimal.ZERO));
         assertFalse(carrinho.getProdutos().contains(produtoCarrinho));
+        verify(emailService).enviarEmailSimples(any(), any(), any());
     }
 
     @Test
